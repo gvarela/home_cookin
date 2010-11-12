@@ -17,7 +17,7 @@ end
 
 usage = <<-END
 To update from your cookbooks run
-cook node.json
+ sudo cook node.json
 END
 
 puts usage
