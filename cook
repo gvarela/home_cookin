@@ -8,6 +8,19 @@
 require 'fileutils'
 require 'open-uri'
 require 'yaml'
+require 'optparse'
+
+options = {}
+
+optparse = OptionParser.new do |opts|
+# Define the options, and what they do
+   options[:rerun] = false
+   opts.on( '-r', '--rerun', 'Rerun cookbooks without re-downloading' ) do
+     options[:rerun] = true
+   end
+end
+
+optparse.parse!
 
 node = ARGV[0] || "#{ENV['HOME']}/.cook"
 
@@ -19,6 +32,7 @@ FileUtils.mkdir_p root = "/tmp/chef-solo"
 
 unless File.exist? gemhome = "#{root}/ruby"
   FileUtils.mkdir_p gemhome
+  puts "Installing the chef gem..."
   system "gem install chef --no-rdoc --no-ri --install-dir #{gemhome}"
 end
 
@@ -30,17 +44,22 @@ File.open(json_attribs = "#{root}/node.json", 'w') do |f|
   open(node) { |r| f.write(r.read) }
 end
 
+puts "Downloading latest cookbooks..." unless options[:rerun]
 cookbooks = YAML.load(open(json_attribs))['cookbooks']
 cookbook_path = cookbooks.to_enum(:each_with_index).map do |path, index|
   target = "#{root}/cookbooks-#{index}"
 
-  FileUtils.rm_rf target
-  FileUtils.mkdir_p target
+  unless options[:rerun]
 
-  if File.exist? path
-    system "cp -R #{path.inspect} #{target}"
-  else
-    system "curl -sL #{path.inspect} | tar -xz -C #{target} -m --strip 1"
+    FileUtils.rm_rf target
+    FileUtils.mkdir_p target
+
+    if File.exist? path
+      system "cp -R #{path.inspect} #{target}"
+    else
+      system "curl -sL #{path.inspect} | tar -xz -C #{target} -m --strip 1"
+    end
+
   end
 
   target
@@ -56,6 +75,7 @@ sandbox_path     "#{root}/sandboxes"
 cache_options    :path => "#{root}/cache/checksums", :skip_expires => true
 RUBY
 
+puts "Running chef-solo..."
 File.open(config = "#{root}/solo.rb", 'w') { |f| f.write CONFIG }
 exec 'chef-solo', '-c', config
 
