@@ -23,3 +23,7 @@ e.g.
           "cookbooks": ["https://github.com/gvarela/osx-cookbooks/tarball/master"]
           "recipes": ["homebrew", "git", "mysql", "imagemagick"]  
         }
+
+Thanks
+=====
+To Josh Peek for the osx-cookbooks and the original cook gist https://gist.github.com/655000
