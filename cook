@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+
+#
+# Originally from Josh Peek
+# https://gist.github.com/655000
+#
+
+require 'fileutils'
+require 'open-uri'
+require 'yaml'
+
+node = ARGV[0] || "#{ENV['HOME']}/.cook"
+
+unless File.exist? node
+  abort "cook node.json"
+end
+
+FileUtils.mkdir_p root = "/tmp/chef-solo"
+
+unless File.exist? gemhome = "#{root}/ruby"
+  FileUtils.mkdir_p gemhome
+  system "gem install chef --no-rdoc --no-ri --install-dir #{gemhome}"
+end
+
+ENV['PATH']    = Dir["#{gemhome}/gems/*/bin"].join(':') + ":#{ENV['PATH']}"
+ENV['RUBYLIB'] = Dir["#{gemhome}/gems/*/lib"].join(':') + ":#{ENV['RUBYLIB']}"
+
+
+File.open(json_attribs = "#{root}/node.json", 'w') do |f|
+  open(node) { |r| f.write(r.read) }
+end
+
+cookbooks = YAML.load(open(json_attribs))['cookbooks']
+cookbook_path = cookbooks.to_enum(:each_with_index).map do |path, index|
+  target = "#{root}/cookbooks-#{index}"
+
+  FileUtils.rm_rf target
+  FileUtils.mkdir_p target
+
+  if File.exist? path
+    system "cp -R #{path.inspect} #{target}"
+  else
+    system "curl -sL #{path.inspect} | tar -xz -C #{target} -m --strip 1"
+  end
+
+  target
+end
+
+
+CONFIG = <<-RUBY
+json_attribs     #{json_attribs.inspect}
+cookbook_path    #{cookbook_path.inspect}
+file_cache_path  "#{root}"
+file_backup_path "#{root}/backup"
+sandbox_path     "#{root}/sandboxes"
+cache_options    :path => "#{root}/cache/checksums", :skip_expires => true
+RUBY
+
+File.open(config = "#{root}/solo.rb", 'w') { |f| f.write CONFIG }
+exec 'chef-solo', '-c', config
+
