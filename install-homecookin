@@ -9,7 +9,7 @@ File.open("/usr/local/bin/cook", 'w') do |f|
   open("https://github.com/gvarela/home_cookin/raw/master/cook") { |r| f.write(r.read) }
 end
 
-FileUtils.chmod 755, "/usr/local/bin/cook"
+FileUtils.chmod 0755, "/usr/local/bin/cook"
 
 usage = <<-END
 To update from your cookbooks run
