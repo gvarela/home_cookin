@@ -1,0 +1,4 @@
+{
+  "cookbooks": ["https://github.com/gvarela/osx-cookbooks/tarball/master"],
+  "recipes": ["homebrew", "git"]
+}

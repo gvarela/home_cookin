@@ -11,6 +11,10 @@ end
 
 FileUtils.chmod 0755, "/usr/local/bin/cook"
 
+File.open("#{ENV['HOME']}/.cook", 'w') do |f|
+  open("https://github.com/gvarela/home_cookin/raw/master/default.json") { |r| f.write(r.read) }
+end
+
 usage = <<-END
 To update from your cookbooks run
 cook node.json
