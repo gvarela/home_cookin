@@ -15,8 +15,12 @@ options = {}
 optparse = OptionParser.new do |opts|
 # Define the options, and what they do
    options[:rerun] = false
+   options[:reset] = false
    opts.on( '-r', '--rerun', 'Rerun cookbooks without re-downloading' ) do
      options[:rerun] = true
+   end
+   opts.on('--reset-env', 'Reset the environment and reinstall chef-solo') do
+    options[:reset] = true
    end
 end
 
@@ -28,7 +32,13 @@ unless File.exist? node
   abort "cook node.json"
 end
 
-FileUtils.mkdir_p root = "/tmp/chef-solo"
+root = "/tmp/chef-solo"
+
+if options[:reset] && File.exist?(root)
+  FileUtils.rm_rf root
+end
+
+FileUtils.mkdir_p root
 
 unless File.exist? gemhome = "#{root}/ruby"
   FileUtils.mkdir_p gemhome
