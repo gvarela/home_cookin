@@ -16,11 +16,20 @@ optparse = OptionParser.new do |opts|
 # Define the options, and what they do
    options[:rerun] = false
    options[:reset] = false
+   options[:verbose] = false
+
    opts.on( '-r', '--rerun', 'Rerun cookbooks without re-downloading' ) do
      options[:rerun] = true
    end
+   opts.on( '-v', '--verbose', 'Use verbose logging for chef-solo' ) do
+     options[:verbose] = true
+   end
    opts.on('--reset-env', 'Reset the environment and reinstall chef-solo') do
     options[:reset] = true
+   end
+   opts.on('-h', '--help', 'Your looking at it') do
+     puts opts
+     exit
    end
 end
 
@@ -83,9 +92,16 @@ file_cache_path  "#{root}"
 file_backup_path "#{root}/backup"
 sandbox_path     "#{root}/sandboxes"
 cache_options    :path => "#{root}/cache/checksums", :skip_expires => true
+log_level        #{options[:verbose] ? ':debug' : ':info'}
 RUBY
 
 puts "Running chef-solo..."
 File.open(config = "#{root}/solo.rb", 'w') { |f| f.write CONFIG }
+
+# make sure we are in the system ruby space so we don't have to deal with the rvm environment
+unless `rvm-prompt`.chomp.empty?
+  abort "WARNING: Please use your system ruby, `rvm system`"
+end
+
 exec 'chef-solo', '-c', config
 
