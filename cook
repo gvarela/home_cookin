@@ -48,6 +48,7 @@ if options[:reset] && File.exist?(root)
 end
 
 FileUtils.mkdir_p root
+FileUtils.chown_R ENV["SUDO_USER"] || ENV["USER"], "staff", root
 
 unless File.exist? gemhome = "#{root}/ruby"
   FileUtils.mkdir_p gemhome

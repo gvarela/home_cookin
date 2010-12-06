@@ -10,8 +10,17 @@ Run your default configuration (~/.cook)
 Run an ad hoc dna.json
         sudo cook node.json
 
-Rerun cook without re-downloading cookbooks (usefull for debugging cookbooks)
+Rerun chef-solo without re-downloading cookbooks (usefull for debugging cookbooks)
         sudo cook node.json --rerun
+
+Reset the home_cookin environment, which reinstalls chef and removes all cache directories
+        sudo cook node.json --reset-env
+
+Run chef-solo with verbose output (debug log level)
+        sudo cook node.json --verbose
+
+Help
+        cook -h
 
 .cook
 ======
