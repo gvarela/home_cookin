@@ -57,8 +57,7 @@ unless File.exist? gemhome = "#{root}/ruby"
 end
 
 ENV['PATH']    = Dir["#{gemhome}/gems/*/bin"].join(':') + ":#{ENV['PATH']}"
-ENV['RUBYLIB'] = Dir["#{gemhome}/gems/*/lib"].join(':') + ":#{ENV['RUBYLIB']}"
-
+ENV['GEM_HOME'] = gemhome
 
 File.open(json_attribs = "#{root}/node.json", 'w') do |f|
   open(node) { |r| f.write(r.read) }
