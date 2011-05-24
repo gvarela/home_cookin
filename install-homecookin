@@ -1,23 +1,14 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env bash
 
-require 'fileutils'
-require 'open-uri'
+sudo mkdir -p /usr/local/bin
+sudo chown -R $USER /usr/local
+sudo chgrp -R staff /usr/local
 
-FileUtils.mkdir_p "/usr/local/bin"
+curl https://github.com/gvarela/home_cookin/raw/master/cook -o /usr/local/bin/cook
+sudo chmod g+x /usr/local/bin/cook
 
-File.open("/usr/local/bin/cook", 'w') do |f|
-  open("https://github.com/gvarela/home_cookin/raw/master/cook") { |r| f.write(r.read) }
-end
 
-FileUtils.chmod 0755, "/usr/local/bin/cook"
+curl https://github.com/gvarela/home_cookin/raw/master/default.json -o $HOME/.cook
 
-File.open("#{ENV['HOME']}/.cook", 'w') do |f|
-  open("https://github.com/gvarela/home_cookin/raw/master/default.json") { |r| f.write(r.read) }
-end
-
-usage = <<-END
-To update from your cookbooks run
- sudo cook node.json
-END
-
-puts usage
+echo "To update from your cookbooks run
+ sudo cook node.json"
