@@ -4,11 +4,11 @@ sudo mkdir -p /usr/local/bin
 sudo chown -R $USER /usr/local
 sudo chgrp -R staff /usr/local
 
-curl https://github.com/gvarela/home_cookin/raw/master/cook -o /usr/local/bin/cook
+curl https://raw.github.com/gvarela/home_cookin/master/cook -o /usr/local/bin/cook
 sudo chmod g+x /usr/local/bin/cook
 
 
-curl https://github.com/gvarela/home_cookin/raw/master/default.json -o $HOME/.cook
+curl https://raw.github.com/gvarela/home_cookin/master/default.json -o $HOME/.cook
 
 echo "To update from your cookbooks run
  sudo cook node.json"
