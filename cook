@@ -98,10 +98,5 @@ RUBY
 puts "Running chef-solo..."
 File.open(config = "#{root}/solo.rb", 'w') { |f| f.write CONFIG }
 
-# make sure we are in the system ruby space so we don't have to deal with the rvm environment
-unless `rvm-prompt`.chomp.empty?
-  abort "WARNING: Please use your system ruby, `rvm system`"
-end
-
 exec 'chef-solo', '-c', config
 
